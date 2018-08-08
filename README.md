@@ -1,4 +1,4 @@
-# Hawaii_RegimesPredictors
+###### Hawaii_RegimesPredictors
 
 **_Parsing Human and Biophysical Drivers of Coral Reef Regimes_**
 ---
@@ -13,11 +13,11 @@ Jouffray JB, Wedding L.M., Norstrom A.V., Donovan M.K., Williams G.J., Crowder L
 
 ***
 
-*Description*
+### *Description*
 
 The study uses machine learning to model the occurrence of four distinct reef regimes – defined by both fish and benthic communities – using the most spatially extensive predictor dataset available across the Hawaiian Islands. We apply boosted regression trees to quantify the relative influence of each biophysical and anthropogenic predictor, identify relationships between predictors and regimes, and characterize interaction patterns. Disentangling the relative contribution of biophysical and anthropogenic predictors provides a deeper understanding of what underpins coral reef regimes and how a reef’s natural setting may either expand or narrow the opportunity space for effective management.
 
-*Content*
+### *Content*
 
 * Script:
 
