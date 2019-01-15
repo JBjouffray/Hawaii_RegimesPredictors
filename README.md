@@ -21,7 +21,7 @@ The study uses machine learning to model the occurrence of four distinct reef re
 
 * Script:
 
-**Hawaii_RegimesPredictors.Rmd**: Rmarkdown script of the analyses in the paper and supplementary material.
+**[Hawaii_RegimesPredictors.Rmd](http://htmlpreview.github.io/?https://github.com/JBjouffray/Hawaii_RegimesPredictors/blob/master/Script/Jouffrayet_al_R%20SCRIPT.htm)**: Rmarkdown script of the analyses in the paper and supplementary material.
 
 * Data:
 
