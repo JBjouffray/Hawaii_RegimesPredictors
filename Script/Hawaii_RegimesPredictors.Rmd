@@ -1,0 +1,510 @@
+---
+title: "R SCRIPT"
+output: html_document
+---
+
+Accompanies Jouffray JB, Wedding L.M., Norstrom A.V., Donovan M.K., Williams G.J., Crowder L.B., Erickson A.L., Friedlander A.M., Graham N.A.J., Gove J.M., Kappel C.V., Kittinger J.N., Lecky J., Oleson K.L.L., Selkoe K.A., White C., Williams I.D., Nystrom M. 2019. Parsing Human and Biophysical Drivers of Coral Reef Regimes. _Proc. R. Soc. B._
+
+**Author:** Jean-Baptiste Jouffray (2019)
+
+**Correspondence:** jean-baptiste.jouffray@su.se
+
+***
+***
+
+## Initialisation
+
+***
+
+Need to install [ggBRT](https://github.com/JBjouffray/ggBRT), a set of custom R functions to visualise and interpret the boosted regression tree results. It requires the following R packages: [directlabels](https://cran.r-project.org/web/packages/directlabels/index.html), [dismo](https://cran.r-project.org/web/packages/dismo/index.html), [dplyr](https://cran.r-project.org/web/packages/dplyr/index.html), [ggplot2](https://cran.r-project.org/web/packages/ggplot2/index.html), [ggthemes](https://cran.r-project.org/web/packages/ggthemes/index.html), [gridExtra](https://cran.r-project.org/web/packages/gridExtra/index.html), [plotly](https://cran.r-project.org/web/packages/plotly/index.html), [plyr](https://cran.r-project.org/web/packages/plyr/index.html) and [reshape2](https://cran.r-project.org/web/packages/reshape2/index.html).
+
+```{r setup, eval=FALSE}
+# Install ggBRT 
+install.packages("devtools") # if package "devtools" not already installed
+devtools::install_github("JBjouffray/ggBRT")
+library(ggBRT)
+
+# Import data
+dat<-read.delim("Hawaii_RegimesPredictors.txt",h=T,dec=",")
+PredictorsCat<-read.delim("Hawaii_PredictorsCategories.txt",h=T,dec=",")
+```
+
+## Summary of the regimes
+***
+The study builds on data from 620 sites classified into four reef regimes using model-based clustering of ten fish and benthic functional groups.
+
+```{r, eval=FALSE}
+# Summary statistics of the regimes' components
+ddply(melt(dat[,c(5:14,35)], id.vars=c("Regime")), c("Regime", "variable"), summarise,
+         mean = round(mean(value),1),
+         sem = round(2*(sd(value)/sqrt(length(value))),1))
+```
+
+## Collinearity
+***
+
+We use pairwise relationship correlation coefficients and variance inflation factor estimates to assess collinearity among predictors. The data presented here (i.e., Hawaii_RegimesPredictors.txt) is already a subset resulting from multiple collinearity analyses.
+
+```{r, eval=FALSE}
+# Select the set of 20 predictors
+pred<-c(15:34)
+
+# Assess collinearity with Pearson correlation coefficient
+library(corrplot)
+coeff<-cor(dat[,pred], method="pearson",use="pairwise.complete.obs")
+coeff[which(abs(coeff[])>0.6)] # no correlation > 0.6
+
+# Correlation plot
+col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+corrplot(coeff,method="number", col=col(200),tl.cex=0.8,number.cex = 0.7,
+         tl.col="black", tl.srt=45)
+
+# Assess collinearity with Variable Inflation Factor
+source("vif_func.R") # available at https://gist.github.com/fawda123/4717702#file-vif_fun-r
+vif_func(in_frame=dat[,pred],thresh=4,trace=T) # all variables have VIF < 4, max VIF 3.28 
+```
+
+## Boosted regression trees (BRT)
+***
+
+We use BRT to examine the occurrence of each regime in relation to anthropogenic and biophysical predictors. Trees are built with set default parameters to make model outputs comparable among regimes: a tree complexity of 5, a learning rate of 0.001 and a bag fraction of 0.75. Variation of these parameters provided negligible improvements in predictive performance. Note that the results and model's performance can vary slightly because of stochasticity.
+
+```{r, eval=FALSE}
+set.seed(1) 
+brt1 <- gbm.step(data=dat, gbm.x = pred, gbm.y = which(names(dat) == 'Regime1'),
+                 family = "bernoulli", tree.complexity = 5,
+                 learning.rate = 0.001, bag.fraction = 0.75)
+brt2 <- gbm.step(data=dat, gbm.x = pred, gbm.y = which(names(dat) == 'Regime2'),
+                 family = "bernoulli", tree.complexity = 5,
+                 learning.rate = 0.001, bag.fraction = 0.75)
+brt3 <- gbm.step(data=dat, gbm.x = pred, gbm.y = which(names(dat) == 'Regime3'),
+                 family = "bernoulli", tree.complexity = 5,
+                 learning.rate = 0.001, bag.fraction = 0.75)
+brt5 <- gbm.step(data=dat, gbm.x = pred, gbm.y = which(names(dat) == 'Regime5'),
+                 family = "bernoulli", tree.complexity = 5,
+                 learning.rate = 0.001, bag.fraction = 0.75)
+
+# Extract the performance of the models
+Perf<-ggPerformance(Regime1=brt1,Regime2=brt2,Regime3=brt3,Regime5=brt5)
+round(Perf,2)
+```
+
+## Relative influence of predictors
+***
+
+To assess the relative contribution of anthropogenic versus biophysical predictors for each regime, we considered only the variables with a relative influence above that expected by chance (100/number of variables, i.e. 5%) and rescaled their influence to 100%.
+
+```{r, eval=FALSE}
+# Plot relative influence of predictors for each regime
+ggInfluence(brt1,col.bar = "grey70")
+ggInfluence(brt2,col.bar = "grey70")
+ggInfluence(brt3,col.bar = "grey70")
+ggInfluence(brt5,col.bar = "grey70")
+
+# Plot relative influence of predictors for all regimes at once
+ggMultiInfluence(Regime1=brt1,Regime2=brt2,Regime3=brt3,Regime5=brt5)
+
+# Extract relative influence of biophysical versus anthropogenic
+ggCatInfluence(brt1,brt2,brt3,brt5,category = "Category",data=PredictorsCat)
+
+# Extract relative influence of biophysical versus anthropogenic by considering only the variables with a relative influence above that expected by chance
+ggCatInfluence(brt1,brt2,brt3,brt5,category = "Category",data=PredictorsCat,signif=T)
+```
+
+## Partial dependency plots
+***
+
+Partial dependency plots with 95% confidence intervals obtained from 1000 bootstrap replicates are used to visualize the relationships between the most influential predictor variables and the response (regime), while keeping all other predictors at their mean. 
+
+```{r, eval=FALSE}
+# Boostrap the BRTs 1000 times for each regime to build confidence intervals
+brt1.prerun<- plot.gbm.4list(brt1)
+brt1.boot <- gbm.bootstrap.functions(brt1, list.predictors=brt1.prerun, n.reps=1000)
+
+brt2.prerun<- plot.gbm.4list(brt2)
+brt2.boot <- gbm.bootstrap.functions(brt2, list.predictors=brt2.prerun, n.reps=1000)
+
+brt3.prerun<- plot.gbm.4list(brt3)
+brt3.boot <- gbm.bootstrap.functions(brt3, list.predictors=brt3.prerun, n.reps=1000)
+
+brt5.prerun<- plot.gbm.4list(brt5)
+brt5.boot <- gbm.bootstrap.functions(brt5, list.predictors=brt5.prerun, n.reps=1000)
+
+# Save the models outcome
+save(brt1,brt2,brt3,brt5,
+     brt1.boot,brt2.boot,brt3.boot,brt5.boot,
+     brt1.prerun,brt2.prerun,brt3.prerun,brt5.prerun, file = "BRT_RegimesPredictors.Rdata") 
+load(file = "BRT_RegimesPredictors.Rdata")
+
+# Draw partial dependency plots for the five most influential predictors
+ggPD_boot(brt1,n.plots = 5, nrow=1,list.4.preds=brt1.prerun, col.line="#CF4D46",
+          booted.preds=brt1.boot$function.preds, cex.line=1, col.ci="#CF4D46",
+          alpha.dot=0.2,type.ci = "ribbon",alpha.ci=0.1,rug = T,y.label = "")
+
+ggPD_boot(brt2,n.plots = 6, nrow=1,list.4.preds=brt2.prerun, col.line="#5576AF",
+          booted.preds=brt2.boot$function.preds, cex.line=1, col.ci="#5576AF",
+          alpha.dot=0.2,type.ci = "ribbon",alpha.ci=0.1,rug = T,y.label = "")
+
+ggPD_boot(brt3,n.plots = 5, nrow=1,list.4.preds=brt3.prerun, col.line="#DDAB34",
+          booted.preds=brt3.boot$function.preds, cex.line=1, col.ci="#DDAB34",
+          alpha.dot=0.2,type.ci = "ribbon",alpha.ci=0.1,rug = T,y.label = "")
+
+ggPD_boot(brt5,n.plots = 5, nrow=1,list.4.preds=brt5.prerun, col.line="#79A45A",
+          booted.preds=brt5.boot$function.preds, cex.line=1, col.ci="#79A45A",
+          alpha.dot=0.2,type.ci = "ribbon",alpha.ci=0.1,rug = T,y.label = "")
+```
+
+## Interactions between predictors
+***
+
+We quantify relative interaction strength between predictor by measuring residual variation between pairwise model predictions with and without interactions.
+
+```{r,eval=FALSE}
+# Regime 1 #
+ggInteract_list(brt1)
+
+# Randomization of the response to test significance of the three strongest interactions. Note, the parameters need to be the same as your BRT model
+Interact_boot_brt1<-ggInteract_boot(c('Complexity','Fishing_NonComm_Boat_Total'),
+                                    c('Complexity','Fishing_Comm_Total'),
+                                    c('Depth','Complexity'),
+                                    nboots = 100,data=dat, predictors = pred, response=which(names(dat) == 'Regime1'),
+                                    family = "bernoulli", tc = 5, lr = 0.001, bf= 0.75,global.env=F)
+
+# Significance histogram (99% CI => p-value=0.01)
+ggInteract_boot_hist(data = Interact_boot_brt1,column = 2,obs = 27.97,
+                     cis=c(0.005, 0.995),bindwidth = 0.1)
+ggInteract_boot_hist(data = Interact_boot_brt1,column = 3,obs = 27.76,
+                     cis=c(0.005, 0.995),bindwidth = 0.1)
+
+# 2D interaction plots of the two strongest interactions
+ggInteract_2D(gbm.object = brt1,x="Complexity",y="Fishing_NonComm_Boat_Total",col.gradient = c("white","#CF4D46"),
+              show.dot = T,col.dot = "grey20",alpha.dot = 0.5,cex.dot = 0.2,
+              label.contour = T,col.contour = "#92271F",show.axis = T,legend = T)
+
+ggInteract_2D(gbm.object = brt1,x="Complexity",y="Fishing_Comm_Total",col.gradient = c("white","#CF4D46"),
+              show.dot = T,col.dot = "grey20",alpha.dot = 0.5,cex.dot = 0.2,
+              label.contour = T,col.contour = "#92271F",show.axis = T,legend = T)
+
+# Regime2 #
+ggInteract_list(brt2)
+
+# Randomization of the response to test significance of interaction
+Interact_boot_brt2<-ggInteract_boot(c('WAV_CLIM_M','SST_STD'),
+                                    c('Depth','WAV_CLIM_M'),
+                                    c('SST_STD','SST_CLIM_M'),
+                                    nboots = 100,data=dat, predictors = pred, response=which(names(dat) == 'Regime2'),
+                                    family = "bernoulli", tc = 5, lr = 0.001, bf= 0.75,global.env=F)
+
+# Significance histogram (99% CI => p-value=0.01)
+ggInteract_boot_hist(data = Interact_boot_brt2,column = 2,obs = 64.82,
+                     cis=c(0.005, 0.995),bindwidth = 0.1)
+ggInteract_boot_hist(data = Interact_boot_brt2,column = 3,obs = 18.51,
+                     cis=c(0.005, 0.995),bindwidth = 0.1)
+
+# 2D interaction plots of the two strongest interactions
+ggInteract_2D(gbm.object = brt2,x="WAV_CLIM_M",y="SST_STD",col.gradient = c("white","#5576AF"),
+              show.dot = T,col.dot = "grey20",alpha.dot = 0.5,cex.dot = 0.2,
+              label.contour = T,col.contour = "#254376",show.axis = T,legend = T)
+
+ggInteract_2D(gbm.object = brt2,x="Depth",y="WAV_CLIM_M",col.gradient = c("white","#5576AF"),
+              show.dot = T,col.dot = "grey20",alpha.dot = 0.5,cex.dot = 0.2,
+              label.contour = T,col.contour = "#254376",show.axis = T,legend = T)
+
+
+# Regime3 #
+ggInteract_list(brt3)
+
+# Randomization of the response to test significance of interaction
+Interact_boot_brt3<-ggInteract_boot(c('PAR_STD','SST_CLIM_M'),
+                                    c('Complexity','PAR_CLIM_M'),
+                                    c('Complexity','WAV_CLIM_M'),
+                                    nboots = 100,data=dat, predictors = pred, response=which(names(dat) == 'Regime3'),
+                                    family = "bernoulli", tc = 5, lr = 0.001, bf= 0.75,global.env=F)
+
+# Significance histogram (99% CI => p-value=0.01)
+ggInteract_boot_hist(data = Interact_boot_brt3,column = 2,obs = 11.91,
+                     cis=c(0.005, 0.995),bindwidth = 0.1)
+ggInteract_boot_hist(data = Interact_boot_brt3,column = 3,obs = 11.47,
+                     cis=c(0.005, 0.995),bindwidth = 0.1)
+
+# 2D interaction plots of the two strongest interactions
+ggInteract_2D(gbm.object = brt3,x="PAR_STD",y="SST_CLIM_M",col.gradient = c("white","#DDAB34"),
+              show.dot = T,col.dot = "grey20",alpha.dot = 0.5,cex.dot = 0.2,
+              label.contour = T,col.contour = "#AF7E0B",show.axis = T,legend = T)
+
+ggInteract_2D(gbm.object = brt3,x="Complexity",y="PAR_CLIM_M",col.gradient = c("white","#DDAB34"),
+              show.dot = T,col.dot = "grey20",alpha.dot = 0.5,cex.dot = 0.2,
+              label.contour = T,col.contour = "#AF7E0B",show.axis = T,legend = T)
+
+
+# Regime5 #
+ggInteract_list(brt5)
+
+# Randomization of the response to test significance of interaction
+Interact_boot_brt5<-ggInteract_boot(c('PAR_STD','Invasive_Algae'),
+                                    c('Depth','Fishing_NonComm_Boat_Total'),
+                                    c('SST_STD','SST_CLIM_M'),
+                                    nboots = 100,data=dat, predictors = pred, response=which(names(dat) == 'Regime5'),
+                                    family = "bernoulli", tc = 5, lr = 0.001, bf= 0.75,global.env=F)
+
+# Significance histogram
+ggInteract_boot_hist(data = Interact_boot_brt5,column = 2,obs = 25.35,
+                     cis=c(0.005, 0.995), bindwidth = 0.1)
+ggInteract_boot_hist(data = Interact_boot_brt5,column = 3,obs = 15.55,
+                     cis=c(0.005, 0.995), bindwidth = 0.1)
+
+# 2D interaction plots of the two strongest interactions
+ggInteract_2D(gbm.object = brt5,x="PAR_STD",y="Invasive_Algae",col.gradient = c("white","#79A45A"),
+              show.dot = T,col.dot = "grey20",alpha.dot = 0.5,cex.dot = 0.2,
+              label.contour = T,col.contour = "#3E6C20",show.axis = T,legend = T)
+
+ggInteract_2D(gbm.object = brt5,x="Depth",y="Fishing_NonComm_Boat_Total",col.gradient = c("white","#79A45A"),
+              show.dot = T,col.dot = "grey20",alpha.dot = 0.5,cex.dot = 0.2,
+              label.contour = T,col.contour = "#3E6C20",show.axis = T,legend = T)
+```
+
+## Scale analysis 
+***
+
+To control for the influence of different predictor's grain sizes on the outcome of the model, we extracted all predictor raster datasets at multiple standardized grain sizes (500m, 1000m, 1500m, 2500m, 4000m), before re-running the BRT on regimes aggregated following a two-thirds majority within each cell resolution.
+
+```{r, eval=FALSE}
+# Import data (one file for each scale: 500, 1000, 1500, 2500 and 4000). For brevity, 
+# of the script, overwrite the names and run all lines again...and so on.
+datScale<-read.delim("scale_500.txt",h=T,dec=",")
+
+# Retain only the sites for which a 2/3rd majority could be calculated
+datScale<-subset(datScale,datScale$Majority=="two_thirds")
+
+# Select set of predictors
+predScale<-c(3,4,15:19,22,26,31:38,40:42)
+
+# Assess collinearity with Pearson
+cor<-cor(datScale[,predScale], method="pearson",use="pairwise.complete.obs")
+w<-which(abs(cor[])>0.6)
+cor[w]
+
+# Assess collinearity with Variable Inflation Factor
+source("vif_func.R")
+vif_func(in_frame=dat[,predScale],thresh=4.1,trace=T)
+
+# Run BRT for each regime with set parameters: tc=5; lr=0.001; bf=0.75.
+# Note that the results will always vary slightly because of stochasticity
+set.seed(1)
+brt1 <- gbm.step(data=datScale, gbm.x = predScale, gbm.y = which(names(datScale) == 'Regime1'),
+                 family = "bernoulli", tree.complexity = 5,
+                 learning.rate = 0.001, bag.fraction = 0.75)
+brt2 <- gbm.step(data=datScale, gbm.x = predScale, gbm.y = which(names(datScale) == 'Regime2'),
+                 family = "bernoulli", tree.complexity = 5,
+                 learning.rate = 0.001, bag.fraction = 0.75)
+brt3 <- gbm.step(data=datScale, gbm.x = predScale, gbm.y = which(names(datScale) == 'Regime3'),
+                 family = "bernoulli", tree.complexity = 5,
+                 learning.rate = 0.001, bag.fraction = 0.75)
+brt5 <- gbm.step(data=datScale, gbm.x = predScale, gbm.y = which(names(datScale) == 'Regime5'),
+                 family = "bernoulli", tree.complexity = 5,
+                 learning.rate = 0.001, bag.fraction = 0.75)
+
+brt1_500<-brt1
+brt2_500<-brt2
+brt3_500<-brt3
+brt5_500<-brt5
+
+# Go back to beginning, import data at a new scale (1000m) and repeat the BRTs
+brt1_1000<-brt1
+brt2_1000<-brt2
+brt3_1000<-brt3
+brt5_1000<-brt5
+
+# Go back to beginning, import data at a new scale (1500m) and repeat the BRTs
+brt1_1500<-brt1
+brt2_1500<-brt2
+brt3_1500<-brt3
+brt5_1500<-brt5
+
+# Go back to beginning, import data at a new scale (2500m) and repeat the BRTs
+brt1_2500<-brt1
+brt2_2500<-brt2
+brt3_2500<-brt3
+brt5_2500<-brt5
+
+# Go back to beginning, import data at a new scale (4000m) and repeat the BRTs
+brt1_4000<-brt1
+brt2_4000<-brt2
+brt3_4000<-brt3
+brt5_4000<-brt5
+
+# Boostrap the BRTs 1000 times for each regime at each scale to build confidence intervals
+#500m
+brt1_500.prerun<- plot.gbm.4list(brt1_500)
+brt1_500.boot <- gbm.bootstrap.functions(brt1_500, list.predictors=brt1_500.prerun, n.reps=1000)
+
+brt2_500.prerun<- plot.gbm.4list(brt2_500)
+brt2_500.boot <- gbm.bootstrap.functions(brt2_500, list.predictors=brt2_500.prerun, n.reps=1000)
+
+brt3_500.prerun<- plot.gbm.4list(brt3_500)
+brt3_500.boot <- gbm.bootstrap.functions(brt3_500, list.predictors=brt3_500.prerun, n.reps=1000)
+
+brt5_500.prerun<- plot.gbm.4list(brt5_500)
+brt5_500.boot <- gbm.bootstrap.functions(brt5_500, list.predictors=brt5_500.prerun, n.reps=1000)
+
+#1000m
+brt1_1000.prerun<- plot.gbm.4list(brt1_1000)
+brt1_1000.boot <- gbm.bootstrap.functions(brt1_1000, list.predictors=brt1_1000.prerun, n.reps=1000)
+
+brt2_1000.prerun<- plot.gbm.4list(brt2_1000)
+brt2_1000.boot <- gbm.bootstrap.functions(brt2_1000, list.predictors=brt2_1000.prerun, n.reps=1000)
+
+brt3_1000.prerun<- plot.gbm.4list(brt3_1000)
+brt3_1000.boot <- gbm.bootstrap.functions(brt3_1000, list.predictors=brt3_1000.prerun, n.reps=1000)
+
+brt5_1000.prerun<- plot.gbm.4list(brt5_1000)
+brt5_1000.boot <- gbm.bootstrap.functions(brt5_1000, list.predictors=brt5_1000.prerun, n.reps=1000)
+
+#1500m
+brt1_1500.prerun<- plot.gbm.4list(brt1_1500)
+brt1_1500.boot <- gbm.bootstrap.functions(brt1_1500, list.predictors=brt1_1500.prerun, n.reps=1000)
+
+brt2_1500.prerun<- plot.gbm.4list(brt2_1500)
+brt2_1500.boot <- gbm.bootstrap.functions(brt2_1500, list.predictors=brt2_1500.prerun, n.reps=1000)
+
+brt3_1500.prerun<- plot.gbm.4list(brt3_1500)
+brt3_1500.boot <- gbm.bootstrap.functions(brt3_1500, list.predictors=brt3_1500.prerun, n.reps=1000)
+
+brt5_1500.prerun<- plot.gbm.4list(brt5_1500)
+brt5_1500.boot <- gbm.bootstrap.functions(brt5_1500, list.predictors=brt5_1500.prerun, n.reps=1000)
+
+#2500m
+brt1_2500.prerun<- plot.gbm.4list(brt1_2500)
+brt1_2500.boot <- gbm.bootstrap.functions(brt1_2500, list.predictors=brt1_2500.prerun, n.reps=1000)
+
+brt2_2500.prerun<- plot.gbm.4list(brt2_2500)
+brt2_2500.boot <- gbm.bootstrap.functions(brt2_2500, list.predictors=brt2_2500.prerun, n.reps=1000)
+
+brt3_2500.prerun<- plot.gbm.4list(brt3_2500)
+brt3_2500.boot <- gbm.bootstrap.functions(brt3_2500, list.predictors=brt3_2500.prerun, n.reps=1000)
+
+brt5_2500.prerun<- plot.gbm.4list(brt5_2500)
+brt5_2500.boot <- gbm.bootstrap.functions(brt5_2500, list.predictors=brt5_2500.prerun, n.reps=1000)
+
+#4000m
+brt1_4000.prerun<- plot.gbm.4list(brt1_4000)
+brt1_4000.boot <- gbm.bootstrap.functions(brt1_4000, list.predictors=brt1_4000.prerun, n.reps=1000)
+
+brt2_4000.prerun<- plot.gbm.4list(brt2_4000)
+brt2_4000.boot <- gbm.bootstrap.functions(brt2_4000, list.predictors=brt2_4000.prerun, n.reps=1000)
+
+brt3_4000.prerun<- plot.gbm.4list(brt3_4000)
+brt3_4000.boot <- gbm.bootstrap.functions(brt3_4000, list.predictors=brt3_4000.prerun, n.reps=1000)
+
+brt5_4000.prerun<- plot.gbm.4list(brt5_4000)
+brt5_4000.boot <- gbm.bootstrap.functions(brt5_4000, list.predictors=brt5_4000.prerun, n.reps=1000)
+
+
+# Save the models outcome
+save(brt1_500,brt2_500,brt3_500,brt5_500,
+     brt1_1000,brt2_1000,brt3_1000,brt5_1000,
+     brt1_1500,brt2_1500,brt3_1500,brt5_1500,
+     brt1_2500,brt2_2500,brt3_2500,brt5_2500,
+     brt1_4000,brt2_4000,brt3_4000,brt5_4000,
+     brt1_500.boot,brt2_500.boot,brt3_500.boot,brt5_500.boot,
+     brt1_1000.boot,brt2_1000.boot,brt3_1000.boot,brt5_1000.boot,
+     brt1_1500.boot,brt2_1500.boot,brt3_1500.boot,brt5_1500.boot,
+     brt1_2500.boot,brt2_2500.boot,brt3_2500.boot,brt5_2500.boot,
+     brt1_4000.boot,brt2_4000.boot,brt3_4000.boot,brt5_4000.boot,
+     file = "SCALE_Hawaii_RegimesPredictors.Rdata")
+
+load(file = "SCALE_Hawaii_RegimesPredictors.Rdata")
+
+# Extract the performance of the models
+ggPerformance(brt1_500=brt1_500,brt2_500=brt2_500,brt3_500=brt3_500,brt5_500=brt5_500,
+                    brt1_1000=brt1_1000,brt2_1000=brt2_1000,brt3_1000=brt3_1000,brt5_1000=brt5_1000,
+                    brt1_1500=brt1_1500,brt2_1500=brt2_1500,brt3_1500=brt3_1500,brt5_1500=brt5_1500,
+                    brt1_2500=brt1_2500,brt2_2500=brt2_2500,brt3_2500=brt3_2500,brt5_2500=brt5_2500,
+                    brt1_4000=brt1_4000,brt2_4000=brt2_4000,brt3_4000=brt3_4000,brt5_4000=brt5_4000)
+
+# Plot relative influence of predictors (repeat for each BRT)
+ggInfluence(brt1_500)
+
+# Draw partial dependency plots of five most influential predictors (repeat for each BRT)
+ggPD_boot(brt1_500,n.plots = 5, nrow=1,list.4.preds=brt1_500.prerun, col.line="#CF4D46",
+          booted.preds=brt1_500.boot$function.preds, cex.line=1, col.ci="#CF4D46",
+          alpha.dot=0.2,type.ci = "ribbon",alpha.ci=0.1,rug = T,y.label = "")
+
+# Retrieve anthropogenic versus biophysical relative influence 
+ggCatInfluence(brt1_500=brt1_500,brt2_500=brt2_500,brt3_500=brt3_500,brt5_500=brt5_500,
+                  brt1_1000=brt1_1000,brt2_1000=brt2_1000,brt3_1000=brt3_1000,brt5_1000=brt5_1000,
+                  brt1_1500=brt1_1500,brt2_1500=brt2_1500,brt3_1500=brt3_1500,brt5_1500=brt5_1500,
+                  brt1_2500=brt1_2500,brt2_2500=brt2_2500,brt3_2500=brt3_2500,brt5_2500=brt5_2500,
+                  brt1_4000=brt1_4000,brt2_4000=brt2_4000,brt3_4000=brt3_4000,brt5_4000=brt5_4000,
+                  category = "Category",data=PredictorsCat)
+
+ggCatInfluence_signif(brt1_500=brt1_500,brt2_500=brt2_500,brt3_500=brt3_500,brt5_500=brt5_500,
+                       brt1_1000=brt1_1000,brt2_1000=brt2_1000,brt3_1000=brt3_1000,brt5_1000=brt5_1000,
+                       brt1_1500=brt1_1500,brt2_1500=brt2_1500,brt3_1500=brt3_1500,brt5_1500=brt5_1500,
+                       brt1_2500=brt1_2500,brt2_2500=brt2_2500,brt3_2500=brt3_2500,brt5_2500=brt5_2500,
+                       brt1_4000=brt1_4000,brt2_4000=brt2_4000,brt3_4000=brt3_4000,brt5_4000=brt5_4000,
+                       category = "Category",data=PredictorsCat)
+```
+
+## Plots of model performance and relative influence across scales
+***
+
+```{r, eval=FALSE}
+# Cross-validated deviance explained
+datScalePerf<-read.table("ModelPerf_Across_Scales.txt",h=T, dec=",")
+datScalePerf<-subset(datScalePerf,datScalePerf$Parameter=="cvPer.Expl")
+datScalePerf$Scale<-as.factor(datScalePerf$Scale)
+
+ggplot(datScalePerf)+
+  geom_boxplot(aes(x=Scale, y=Value),coef=2,fill = "grey90", colour = "grey30")+
+  geom_point(aes(x=Scale,y=Value,colour=Regime,shape=Regime),size=3,alpha=0.8)+
+  scale_colour_manual(name = '',values=c("#CF4D46", "#5576AF", "#DDAB34","#79A45A"))+
+  scale_shape_manual(name = '',values=c(4,15,17,16))+
+  labs(x="Grain size (m)", y="Cross-validated deviance explained (%) ")+
+  ylim(0,100)+
+  theme_bw()+
+  theme(panel.grid=element_blank(),
+        legend.position = "right",
+        axis.text.x  = element_text(size=14),
+        axis.text.y  = element_text(size=14))
+
+
+# Cross-validated area under the receiver operating character (AUC)
+datScalePerf<-read.table("ModelPerf_Across_Scales.txt",h=T, dec=",")
+datScalePerf<-subset(datScalePerf,datScalePerf$Parameter=="cvAUC")
+datScalePerf$Scale<-as.factor(datScalePerff$Scale)
+
+ggplot(datScalePerf)+
+  geom_boxplot(aes(x=Scale, y=Value),coef=2,fill = "grey90", colour = "grey30")+
+  geom_point(aes(x=Scale,y=Value,colour=Regime,shape=Regime),size=3,alpha=0.8)+
+  scale_colour_manual(name = '',values=c("#CF4D46", "#5576AF", "#DDAB34","#79A45A"))+
+  scale_shape_manual(name = '',values=c(4,15,17,16))+
+  labs(x="Grain size (m)", y="Cross-validated AUC")+
+  ylim(0.5,1)+
+  theme_bw()+
+  theme(panel.grid=element_blank(),
+        legend.position = "right",
+        axis.text.x  = element_text(size=14),
+        axis.text.y  = element_text(size=14))
+
+
+# Relative influence of anthropogenic predictors
+datScaleRel<-read.table("RelInfluence_Across_Scales.txt",h=T, dec=",")
+datScaleRel<-subset(datScaleRel,datScaleRel$Category=="Anthropogenic")
+datScaleRel$Scale<-as.factor(datScaleRel$Scale)
+
+ggplot(datScaleRel)+
+  geom_boxplot(aes(x=Scale, y=Sig_Influence),coef=2,fill = "grey90", colour = "grey30")+
+  geom_point(aes(x=Scale,y=Sig_Influence,colour=Regime,shape=Regime),size=3,alpha=0.8)+
+  scale_colour_manual(name = '',values=c("#CF4D46", "#5576AF", "#DDAB34","#79A45A"))+
+  scale_shape_manual(name = '',values=c(4,15,17,16))+
+  labs(x="Grain size (m)", y="Anthropogenic relative influence (%) ")+
+  ylim(0,100)+
+  theme_bw()+
+  theme(panel.grid=element_blank(),
+        legend.position = "right",
+        axis.text.x  = element_text(size=14),
+        axis.text.y  = element_text(size=14))
+```
+
+
