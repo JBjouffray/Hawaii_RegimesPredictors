@@ -3,7 +3,7 @@
 **_Parsing Human and Biophysical Drivers of Coral Reef Regimes_**
 ---
 
-This repository includes data and analysis scripts to accompany:
+This repository includes [data](https://github.com/JBjouffray/Hawaii_RegimesPredictors/tree/master/Data) and [analysis scripts](http://htmlpreview.github.io/?https://github.com/JBjouffray/Hawaii_RegimesPredictors/blob/master/Script/Hawaii_RegimesPredictors.htm) to accompany:
 
 Jouffray JB, Wedding L.M., Norstrom A.V., Donovan M.K., Williams G.J., Crowder L.B., Erickson A.L., Friedlander A.M., Graham N.A.J., Gove J.M., Kappel C.V., Kittinger J.N., Lecky J., Oleson K.L.L., Selkoe K.A., White C., Williams I.D., Nystrom M. 2019. Parsing Human and Biophysical Drivers of Coral Reef Regimes. _Proc. R. Soc. B._
 
