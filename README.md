@@ -11,8 +11,6 @@ Jouffray JB, Wedding L.M., Norstrom A.V., Donovan M.K., Williams G.J., Crowder L
 
 **Correspondence:** jean-baptiste.jouffray@su.se
 
-[test](https://jbjouffray.github.io/Hawaii_RegimesPredictors/docs/ggBRT_Tutorial.html)
-
 ***
 
 ### *Description*
