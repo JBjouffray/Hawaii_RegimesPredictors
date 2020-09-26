@@ -1,11 +1,13 @@
 # Hawaiian_RegimePredictors
 
-This repo was forked from JBjouffray/Hawaii_RegimesPredictors. The folders/files added by me as a part of the SMA project are listed under the What's New part of this README. The original README is located at README_JouffaryJB.md.
+This repo was forked from JBjouffray/Hawaii_RegimesPredictors for a project in my Statistical Methods and Analysis course. The folders/files added by me as a part of the SMA project are listed under the 'My additions' part of this README. The original README is located at README_JouffaryJB.md.
 
-## Project
-This project was created was created as a part of my ICA component for the Statistical Methods and Analysis course.
+## Objectives of the project
 
-## What's New
+- visualize which factors are the most influential in the formation of each regime 
+- to predict which regime may found at a location on the Hawaiian islands based on the factors found there
+
+## My additions
 All the work for my project is in the following folders:
 
 - new datasets
