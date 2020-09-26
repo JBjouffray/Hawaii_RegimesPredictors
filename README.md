@@ -11,7 +11,7 @@ This repo was forked from JBjouffray/Hawaii_RegimesPredictors for a project in m
 All the work for my project is in the following folders:
 
 - new datasets
-- scripts/notebooks
+- scripts
 - media
 - report
 
@@ -22,12 +22,12 @@ Note: All the datasets used in this project have been uploaded to the respective
 
 | Notebook  | Contents  |   
 |---|---|
-| new datasets/train_test_split_ipynb  | Datapreprocessing  |   
-| new datasets/PCA.ipynb  | Principal Data Analysis to frame a hypothesis  |   
-| new datasets/Exploratory_Data_analysis.ipynb  | Perform EDA on the datset  |  
-| new datasets/Baseline_Logistic_Regression.ipynb  | Initial LogReg model  |  
-| new datasets/Baseline_Logistic_Regression_bestmodel.ipynb  | Best selected LogReg model  |   
-| new datasets/SVM_polyandgauss  | Support Vector Machine model  |  
+| scripts/train_test_split_ipynb  | Datapreprocessing  |   
+| scripts/PCA.ipynb  | Principal Data Analysis to frame a hypothesis  |   
+| scripts/Exploratory_Data_analysis.ipynb  | Perform EDA on the datset  |  
+| scripts/Baseline_Logistic_Regression.ipynb  | Initial LogReg model  |  
+| scripts/Baseline_Logistic_Regression_bestmodel.ipynb  | Best selected LogReg model  |   
+| scripts/SVM_polyandgauss  | Support Vector Machine model  |  
 |   |   |   
 |   |   |   
 |   |   |   
