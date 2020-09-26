@@ -1,4 +1,4 @@
-###Hawaiian_RegimePredictors
+# Hawaiian_RegimePredictors
 
 This repo was forked from JBjouffray/Hawaii_RegimesPredictors. The folders/files added by me as a part of the SMA project are listed under the What's New part of this README.
 The original README is located at README-JouffaryJB.md.
