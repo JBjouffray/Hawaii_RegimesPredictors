@@ -17,14 +17,14 @@ All the other files from the previous paper have been left in place.
 
 ## What does each folder contain
 
-|   |   |   |   |   |
-|---|---|---|---|---|
-|   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
+| Notebook  | Contents  |   
+|---|---|
+| new datasets/train_test_split_ipynb  | Datapreprocessing  |   
+| new datasets/PCA.ipynb  | Principal Data Analysis to frame a hypothesis  |   
+| new datasets/Exploratory_Data_analysis.ipynb  | Perform EDA on the datset  |  
+| new datasets/Baseline_Logistic_Regression.ipynb  | Initial LogReg model  |  
+| new datasets/Baseline_Logistic_Regression_bestmodel.ipynb  | Best selected LogReg model  |   
+| new datasets/SVM_polyandgauss  | Support Vector Machine model  |  
+|   |   |   
+|   |   |   
+|   |   |   
