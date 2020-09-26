@@ -17,6 +17,8 @@ All the work for my project is in the following folders:
 
 All the other files from the previous paper have been left in place.
 
+### Note: All the datasets used in this project have been uploaded to the respective notebooks from Google Drive and can be found in new datasets
+
 ## What does each folder contain
 
 | Notebook  | Contents  |   
