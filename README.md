@@ -14,7 +14,8 @@ This repo was forked from JBjouffray/Hawaii_RegimesPredictors for a project in m
     - plot the correlation between all the predictors to ensure that none of them are very highly correlated ( possibly drop those that are)
     - plot a Kernel Density Estimation plot for the fish and benthic communities with mean/median markers to visualize composition of each regime
     - plot a Kernel Density Estimation plot for the anthropogenic (human) factors with mean/median markers to visualize theis contribution towards regime formation
-    
+    - plot a Kernel Density Estimation plot for the biophysical factors with mean/median markers to visualize theis contribution towards regime formation
+
 3. visualize which factors are the most influential in the formation of each regime 
 4. To predict which regime may found at a location on the Hawaiian islands based on the factors found there
 
