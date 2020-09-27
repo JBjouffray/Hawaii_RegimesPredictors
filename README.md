@@ -2,7 +2,7 @@
 
 This repo was forked from JBjouffray/Hawaii_RegimesPredictors for a project in my Statistical Methods and Analysis course. The folders/files added by me as a part of the SMA project are listed under the 'My additions' part of this README. The original README is located at README_JouffaryJB.md.
 
-## :tropical_fish:Objectives of the project
+## :tropical_fish: Objectives of the project
 
 1. Frame a hypothesis on the basis of Principal Component Analysis of the 4 Coral Reef Regimes
     - perform pairwise PCA and complete PCA with 2 principal components considered
@@ -43,5 +43,5 @@ Note: All the datasets used in this project have been uploaded to the respective
 |   |   |   
 |   |   |   
 
-## 🔮 What's next?
+## 🔮  What's next?
 
