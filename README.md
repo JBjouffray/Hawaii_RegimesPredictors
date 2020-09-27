@@ -13,11 +13,13 @@ This repo was forked from JBjouffray/Hawaii_RegimesPredictors for a project in m
     - visualize the distribution of the regimes across the 8 Hawaiian islands
     - plot the correlation between all the predictors to ensure that none of them are very highly correlated ( possibly drop those that are)
     - plot a Kernel Density Estimation plot for the fish and benthic communities with mean/median markers to visualize composition of each regime
-    - plot a Kernel Density Estimation plot for the anthropogenic (human) factors with mean/median markers to visualize theis contribution towards regime formation
-    - plot a Kernel Density Estimation plot for the biophysical factors with mean/median markers to visualize theis contribution towards regime formation
+    - plot the most influential anthropogenic (human) and biophysical factors for the formation of each regime 
 
-3. visualize which factors are the most influential in the formation of each regime 
-4. To predict which regime may found at a location on the Hawaiian islands based on the factors found there
+### 3. Logistic Regression Models
+
+### 4. Support Vector Machine (Classifier) Models
+
+### 5. Decision Tree Models
 
 ## My additions
 All the work for my project is in the following folders:
@@ -45,4 +47,10 @@ Note: All the datasets used in this project have been uploaded to the respective
 |   |   |   
 
 ## What's next?
+
+- Include the complexity and depth features in the dataset (have been removed in Hawaiian_Predictors_revised.csv)
+- Replace NAs in the dataset with imputed mean values and fit the new dataset on previously used models
+- Add new non-linear features using feature engineering to improve model performance
+- Fit the datasets (Hawaiian_Predictors_revised.csv and any new datasets) to a Neural Network and evaluate model performance
+- Apply a Linear Regression model and predict movement of Regime 2, 3 or 5 into Regime 1
 
