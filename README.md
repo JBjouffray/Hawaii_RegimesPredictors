@@ -2,12 +2,12 @@
 
 This repo was forked from JBjouffray/Hawaii_RegimesPredictors for a project in my Statistical Methods and Analysis course. The folders/files added by me as a part of the SMA project are listed under the 'My additions' part of this README. The original README is located at README_JouffaryJB.md.
 
-## :tropical_fish: Objectives of the project
+## Objectives of the project
 
-1. Frame a hypothesis on the basis of Principal Component Analysis of the 4 Coral Reef Regimes
+### 1. Frame a hypothesis on the basis of Principal Component Analysis of the 4 Coral Reef Regimes
     - perform pairwise PCA and complete PCA with 2 principal components considered
    
-2. Perform Exploratory Data Analysis on the dataset after splitting it into training and testing sets
+### 2. Perform Exploratory Data Analysis on the dataset after splitting it into training and testing sets
     - ensure that training and testing data is equally spread across all 4 regimes
     - ensure that training and testing data is well distributed between the 8 Hawaiian islands
     - visualize the distribution of the regimes across the 8 Hawaiian islands
@@ -18,7 +18,7 @@ This repo was forked from JBjouffray/Hawaii_RegimesPredictors for a project in m
 3. visualize which factors are the most influential in the formation of each regime 
 4. To predict which regime may found at a location on the Hawaiian islands based on the factors found there
 
-## :heavy_plus_sign: My additions
+## My additions
 All the work for my project is in the following folders:
 
 - new datasets
@@ -29,7 +29,7 @@ All the work for my project is in the following folders:
 All the other files from the previous paper have been left in place.
 Note: All the datasets used in this project have been uploaded to the respective notebooks from Google Drive and can be found in the 'new datasets' folder.
 
-## :bookmark_tabs: What does each script contain
+## What does each script contain
 
 | Script  | Contents  |   
 |---|---|
@@ -43,5 +43,5 @@ Note: All the datasets used in this project have been uploaded to the respective
 |   |   |   
 |   |   |   
 
-## 🔮  What's next?
+## What's next?
 
