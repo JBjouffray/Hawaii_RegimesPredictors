@@ -39,8 +39,7 @@ Note: All the datasets used in this project have been uploaded to the respective
 | scripts/train_test_split_ipynb  | Data Preprocessing  |   
 | scripts/PCA.ipynb  | Principal Data Analysis to frame a hypothesis  |   
 | scripts/Exploratory_Data_analysis.ipynb  | Perform EDA on the datset  |  
-| scripts/Baseline_Logistic_Regression.ipynb  | Initial LogReg model  |  
-| scripts/Baseline_Logistic_Regression_bestmodel.ipynb  | Best selected LogReg model  |   
+| scripts/Baseline_Logistic_Regression.ipynb  | Initial and best LogReg model  |  
 | scripts/SVM_polyandgauss.ipynb  | Support Vector Machine models with Gaussian and Polynomial kernels  |  
 |   |   |   
 |   |   |   
