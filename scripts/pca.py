@@ -1,8 +1,8 @@
 
 # Principal Component Analysis
-
+"""
 PCA is used to reduce the number of variables of a data set, while preserving as much information as possible
-
+"""
 ### General Dependacies
 
 import pandas as pd
