@@ -32,19 +32,6 @@ All the work for my project is in the following folders:
 All the other files from the previous paper have been left in place.
 Note: All the datasets used in this project have been uploaded to the respective notebooks from Google Drive and can be found in the 'new datasets' folder.
 
-## What does each script contain
-
-| Script  | Contents  |   
-|---|---|
-| scripts/train_test_split_ipynb  | Data Preprocessing  |   
-| scripts/PCA.ipynb  | Principal Data Analysis to frame a hypothesis  |   
-| scripts/Exploratory_Data_analysis.ipynb  | Perform EDA on the datset  |  
-| scripts/Baseline_Logistic_Regression.ipynb  | Initial and best LogReg model  |  
-| scripts/SVM_polyandgauss.ipynb  | Support Vector Machine models with Gaussian and Polynomial kernels  |  
-|   |   |   
-|   |   |   
-|   |   |   
-
 ## What's next?
 
 - Include the complexity and depth features in the dataset (have been removed in Hawaiian_Predictors_revised.csv)
