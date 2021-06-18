@@ -1,37 +1,42 @@
-###### Hawaii_RegimesPredictors
+# Hawaiian_RegimePredictors
 
-**_Parsing Human and Biophysical Drivers of Coral Reef Regimes_**
----
+This repo was forked from JBjouffray/Hawaii_RegimesPredictors for a project in my Statistical Methods and Analysis course. The folders/files added by me as a part of the SMA project are listed under the 'My additions' part of this README. The original README is located at README_JouffaryJB.md.
 
-This repository includes [data](https://github.com/JBjouffray/Hawaii_RegimesPredictors/tree/master/Data) and [analysis scripts](https://jbjouffray.github.io/Hawaii_RegimesPredictors/Hawaii_RegimesPredictors.html) to accompany:
+## Objectives of the project
 
-Jouffray JB, Wedding L.M., Norstrom A.V., Donovan M.K., Williams G.J., Crowder L.B., Erickson A.L., Friedlander A.M., Graham N.A.J., Gove J.M., Kappel C.V., Kittinger J.N., Lecky J., Oleson K.L.L., Selkoe K.A., White C., Williams I.D., Nystrom M. 2019. [Parsing human and biophysical drivers of coral reef regimes](http://dx.doi.org/10.1098/rspb.2018.2544). _Proc. R. Soc. B_ 286: 20182544. 
+1. Frame a hypothesis on the basis of Principal Component Analysis of the 4 Coral Reef Regimes
+    - perform pairwise PCA and complete PCA with 2 principal components considered
+   
+2. Perform Exploratory Data Analysis on the dataset after splitting it into training and testing sets
+    - ensure that training and testing data is equally spread across all 4 regimes
+    - ensure that training and testing data is well distributed between the 8 Hawaiian islands
+    - visualize the distribution of the regimes across the 8 Hawaiian islands
+    - plot the correlation between all the predictors to ensure that none of them are very highly correlated ( possibly drop those that are)
+    - plot a Kernel Density Estimation plot for the fish and benthic communities with mean/median markers to visualize composition of each regime
+    - plot the most influential anthropogenic (human) and biophysical factors for the formation of each regime 
 
+3. Logistic Regression Models
 
-**Author:** Jean-Baptiste Jouffray (2019)
+4. Support Vector Machine (Classifier) Models
 
-**Correspondence:** jean-baptiste.jouffray@su.se
+5. Decision Tree Models
 
-***
+## My additions
+All the work for my project is in the following folders:
 
-### *Description*
+- new datasets
+- scripts
+- media
+- report
 
-The study uses machine learning to model the occurrence of four distinct reef regimes, defined by both fish and benthic communities ([Donovan _et al_. 2018](https://www.nature.com/articles/s41598-018-35057-4)), using the most spatially extensive predictor dataset available across the Hawaiian Islands. We apply boosted regression trees to quantify the relative influence of each biophysical and anthropogenic predictor, identify relationships between predictors and regimes, and characterize interaction patterns. Disentangling the relative contribution of biophysical and anthropogenic predictors provides a deeper understanding of what underpins coral reef regimes and how a reef's natural setting may either expand or narrow the opportunity space for effective management.
+All the other files from the previous paper have been left in place.
+Note: All the datasets used in this project have been uploaded to the respective notebooks from Google Drive and can be found in the 'new datasets' folder.
 
-### *Content*
+## What's next?
 
-* Script:
+- Include the complexity and depth features in the dataset (have been removed in Hawaiian_Predictors_revised.csv)
+- Replace NAs in the dataset with imputed mean values and fit the new dataset on previously used models
+- Add new non-linear features using feature engineering to improve model performance
+- Fit the datasets (Hawaiian_Predictors_revised.csv and any new datasets) to a Neural Network and evaluate model performance
+- Apply a Linear Regression model and predict movement of Regime 2, 3 or 5 into Regime 1
 
-[**Hawaii_RegimesPredictors.Rmd**](https://jbjouffray.github.io/Hawaii_RegimesPredictors/Hawaii_RegimesPredictors.html): Rmarkdown script of the analyses for the paper and supplementary material.
-
-* Data:
-
-**RegimesPredictors.txt:** main data file containing the regimes and predictors values for 620 sites.
-
-**PredictorsCategories.txt:** categorization of the predictors as either "Anthropogenic" or "Biophysical".
-
-**scale_500.txt; scale_1000.txt; scale_1500.txt; scale_2500.txt; scale_4000.txt:** predictor raster datasets extracted at multiple standardized grain sizes (500m, 1000m, 1500m, 2500m, 4000m) and associated to regimes aggregated following a two-thirds majority within each cell resolution. 
-
-**ModelPerf_Across_Scales.txt:** model performance for each regime at mutliple grain sizes.
-
-**RelInfluence_Across_Scales.txt:** anthropogenic relative influence for each regime at mutliple grain sizes.
